@@ -302,6 +302,14 @@ Rodar nos dois brokers para verificar interface com o Zookeeper
 ```
 zkCli.sh -server localhost:2181
 ```
+Verificar os IDs associados pelo Zookeeper no uso distribuído do Kafka: Broker1(1001) e Broker2(1002)
+
+```
+ls /brokers/ids
+```
+
+<img width="354" alt="image" src="https://github.com/user-attachments/assets/ed866a10-b932-4bfc-8fe5-8dea20c21285">
+
 
 <img width="1148" alt="Screenshot 2024-09-13 at 19 43 29" src="https://github.com/user-attachments/assets/7a34976d-f8b2-4d16-b978-2834facd087c">
 
