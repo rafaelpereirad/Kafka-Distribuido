@@ -37,7 +37,7 @@ ssh -i /caminho/da/chave/privada/gerada/private_key opc@IP_publico_instâncias
 <img width="759" alt="image" src="https://github.com/user-attachments/assets/7dd39282-a64b-492f-ad00-68a3547cfd7c">
 
 
-Rodar em todas as instâncias:
+Executar em todas as instâncias:
 
 ```
 sudo apt-get update
@@ -75,7 +75,7 @@ Copiar os hostnames de todas as máquinas:
 10.0.0.10   broker2
 ```
 
-Rodar nos Brokers 1 e 2 para instalar o Zookeeper:
+Executar nos Brokers 1 e 2 para instalar o Zookeeper:
 
 ```
 wget https://dlcdn.apache.org/zookeeper/zookeeper-3.9.2/apache-zookeeper-3.9.2-bin.tar.gz
@@ -136,12 +136,11 @@ Restart=on-failure
 WantedBy=default.target
 ```
 
-Recarregar os daemons:
+Recarregar os daemons do Zookeeeper:
 
 ```
 sudo systemctl daemon-reload
 sudo systemctl start zookeeper
-sudo systemctl status zookeeper
 ```
 
 Instalar kafka em todas as máquinas:
@@ -163,11 +162,13 @@ delete.topic.enable = true
 log.dirs=/usr/local/kafka/logs
 ```
 
+Nos Brokers:
+
 ```
 sudo nano /etc/systemd/system/zookeeper.service
 ```
 
-Editar:
+Editar para conectar Zookeeper com o Kafka:
 
 ```
 [Unit]
@@ -199,6 +200,21 @@ Restart=on-abnormal
 WantedBy=multi-user.target
 ```
 
+Gerar um UUID para o cluster:
+
+```
+KAFKA_CLUSTER_ID="$(bin/kafka-storage.sh random-uuid)"
+bin/kafka-storage.sh format -t $KAFKA_CLUSTER_ID -c config/kraft/server.properties
+bin/kafka-server-start.sh config/kraft/server.properties
+```
+
+Executar em cada nos Brokers para iniciar o Kafka integrado com o Zookeeper:
+
+```
+bin/kafka-server-start.sh config/server.properties
+bin/kafka-server-start.sh config/server.properties
+```
+
 Iniciar a aplicação:
 ```
 sudo systemctl start kafka
@@ -221,14 +237,13 @@ export PATH=$PATH:$ZOOKEEPER_HOME/bin
 export PATH=$ZOOKEEPER_HOME/bin:$PATH
 ```
 
-Rodar:
+Executar:
 
 ```
 source ~/.bashrc
 ```
 
-
-Rodar comandos para instalar habilitar portas para o Zookeeper e Kafka no firewall:
+Executar comandos para instalar habilitar portas para o Zookeeper e Kafka no firewall (porta 2181 para Zookeeper e 6667 para Broker do Kafka):
 
 ```
 sudo apt install firewalld
@@ -239,8 +254,72 @@ sudo firewall-cmd --permanent --add-port=6667/tcp
 sudo firewall-cmd --reload
 ```
 
+## Demonstração prática
+
+Broker1: Criar um tópico com fator de replicação 2 (distribui para 2 nós - Brokers) com 4 partições:
+
+```
+kafka-topics.sh --zookeeper localhost:2181 --create --topic SistemasDistrib --replication-factor 2 --partitions 3
+```
+
+<img width="566" alt="image" src="https://github.com/user-attachments/assets/eccd88e6-0cb1-4001-9081-d307350ab516">
 
 
+Broker2: Lê o tópico criado no outro broker
 
+```
+kafka-topics.sh --zookeeper localhost:2181 --describe --topic SistemasDistrib
+
+```
+
+<img width="565" alt="image" src="https://github.com/user-attachments/assets/85182ff6-d6c1-494c-9668-9d0c9e353ab4">
+
+
+Producer: Escreve no tópico no cluster do kafka(Broker1 e Broker2 de forma invisível sobre qual kafka Broker está sendo escrito)
+
+```
+kafka-console-producer.sh --broker-list kafka-cluster:6667 --topic SistemasDistrib
+```
+
+<img width="569" alt="image" src="https://github.com/user-attachments/assets/8e1c8446-6b9f-46c9-925b-7ad235e01364">
+
+
+Consumer lê do cluster dos brokers com o kafka sem especificar um Broker em específico para realizar a leitura:
+
+```
+kafka-console-consumer.sh --topic SistemasDistrib --bootstrap-server kafka-cluster:6667 --from-beginning
+```
+
+<img width="563" alt="image" src="https://github.com/user-attachments/assets/9a264634-a440-45c5-91d9-a17a8eb1e217">
+
+Terminais sendo executados em paralelo:
+
+<img width="1145" alt="image" src="https://github.com/user-attachments/assets/8a4067e7-3dc4-426a-8c5b-c6c2a413f9c2">
+
+
+Rodar nos dois brokers para verificar interface com o Zookeeper
+
+```
+zkCli.sh -server localhost:2181
+```
+
+<img width="1148" alt="Screenshot 2024-09-13 at 19 43 29" src="https://github.com/user-attachments/assets/7a34976d-f8b2-4d16-b978-2834facd087c">
+
+Nela é possível verificar o tópico criado que exemplifica a forma como o Zookeeper trabalha com os Brokers do Kafka de modo a fazer a distribuição da aplicação no cluster:
+
+```
+get /brokers/topics/SistemasDistrib
+```
+
+<img width="563" alt="image" src="https://github.com/user-attachments/assets/31884a2c-9e3b-4453-9b5f-610dba24beb2">
+
+
+Vizualizar todos os tópicos criados pelo Kafka:
+
+```
+ls /brokers/topics
+```
+
+<img width="564" alt="image" src="https://github.com/user-attachments/assets/9fe00ead-5c6c-4dce-bcf6-dd5530dca2eb">
 
 
