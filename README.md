@@ -302,18 +302,19 @@ Rodar nos dois brokers para verificar interface com o Zookeeper
 ```
 zkCli.sh -server localhost:2181
 ```
+
+<img width="1148" alt="Screenshot 2024-09-13 at 19 43 29" src="https://github.com/user-attachments/assets/7a34976d-f8b2-4d16-b978-2834facd087c">
+
 Verificar os IDs associados pelo Zookeeper no uso distribuído do Kafka: Broker1(1001) e Broker2(1002)
 
 ```
 ls /brokers/ids
 ```
 
-<img width="354" alt="image" src="https://github.com/user-attachments/assets/ed866a10-b932-4bfc-8fe5-8dea20c21285">
+![image](https://github.com/user-attachments/assets/e65d5c88-18ec-4ec3-a949-7b601b89093a)
 
 
-<img width="1148" alt="Screenshot 2024-09-13 at 19 43 29" src="https://github.com/user-attachments/assets/7a34976d-f8b2-4d16-b978-2834facd087c">
-
-Nela é possível verificar o tópico criado que exemplifica a forma como o Zookeeper trabalha com os Brokers do Kafka de modo a fazer a distribuição da aplicação no cluster:
+Na interface com o Zookeeper é possível verificar o tópico criado que exemplifica a forma como o Zookeeper trabalha com os Brokers do Kafka de modo a fazer a distribuição da aplicação no cluster:
 
 ```
 get /brokers/topics/SistemasDistrib
