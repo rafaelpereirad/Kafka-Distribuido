@@ -1,14 +1,6 @@
-# Kafka Distribuído
-
-Lucas Rafael Alves de Souza
-
-Sérgio Henrique Mendes de Assis
-
-Criar 4 instâncias de máquinas virtuais na Nuvem da Oracle: 2 Brokers, 1 Consumer e 1 Producer
+# Project install 
 
 <img width="445" alt="image" src="https://github.com/user-attachments/assets/7aa83748-bc1d-4881-85cb-afd2fd360b83">
-
-Geração de chave ssh no terminal para acesso nas máquinas e colocar a chave pública na criação da instância:
 
 ```
 ssh-keygen -t rsa -b 2048
@@ -17,8 +9,6 @@ ssh-keygen -t rsa -b 2048
 <img width="239" alt="image" src="https://github.com/user-attachments/assets/14eed280-98f3-47fc-9fdf-2bee4108aa7c">
 
 <img width="603" alt="image" src="https://github.com/user-attachments/assets/2fbfce9f-8cf8-4d1d-9859-67885ae42151">
-
-Repetir o processo de criação das máquinas para as outras intâncias atribuindo IPs privados 10.0.0.7-10.0.0.10:
 
 <img width="412" alt="image" src="https://github.com/user-attachments/assets/419c29b4-fd61-4632-bf9c-ca2a56622957">
 
